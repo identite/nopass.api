@@ -1,5 +1,10 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
@@ -7,33 +12,39 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using NoPassIntegrationExample.Data;
+using NoPassIntegrationExample.Core.Settings;
+using NoPassIntegrationExample.Contracts;
+using NoPassIntegrationExample.Hubs;
 using NoPassIntegrationExample.Services;
 using NoPassIntegrationExample.Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using NoPassIntegrationExample.Data;
 
 namespace NoPassIntegrationExample
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+                options.UseNpgsql(
+                    Configuration.GetConnectionString("PostgresConnection")));
+           
             services.AddDatabaseDeveloperPageExceptionFilter();
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddRazorPages();
 
@@ -41,9 +52,17 @@ namespace NoPassIntegrationExample
             services.AddHttpClient();
 
             // Enable services for working with tokens
-            services.AddSingleton<IRegistrationNoPassService, RegistrationNoPassService>();
+            services.AddSingleton<IRegistrationNoPassService, RegistrationNoPassService>(); 
             services.AddSingleton<ILoginNoPassService, LoginNoPassService>();
 
+            // Configuring the library SignalR
+            services.AddSignalR(hubOptions =>
+            {
+                hubOptions.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
+                hubOptions.EnableDetailedErrors = false; 
+            });
+
+            // Get settings from appsettings.json
             services.Configure<NoPassSettings>(Configuration.GetSection("NoPassSettings"));
         }
 
@@ -81,12 +100,12 @@ namespace NoPassIntegrationExample
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapRazorPages();
+                endpoints.MapRazorPages(); 
                 endpoints.MapControllers();
                 endpoints.MapHub<CommunicationHub>("/signalR",
                     options =>
                     {
-                        options.Transports = HttpTransportType.LongPolling;
+                        options.Transports = HttpTransportType.LongPolling; 
                     });
             });
         }
