@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  site:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    container_name: NoPassIntegrationExample
+    networks:
+      - noPass
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - postgres
+  postgres:
+    container_name: postgres
+    image: postgres:13.4
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - noPass
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: databaseNoPass 
+      POSTGRES_PASSWORD: somePasswordPostgres
+
+volumes:
+  pgdata:
+    external: false
+    name: pgdata
+
+networks:
+  noPass:
+    name: noPass

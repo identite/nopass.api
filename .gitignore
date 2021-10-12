@@ -10,7 +10,6 @@
 *.userosscache
 *.sln.docstates
 *.txt
-!LICENSE.txt
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
