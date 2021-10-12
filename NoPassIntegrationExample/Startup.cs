@@ -37,6 +37,9 @@ namespace NoPassIntegrationExample
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddRazorPages();
 
+            services.AddSwaggerGen();
+            services.AddHttpClient();
+
             // Enable services for working with tokens
             services.AddSingleton<IRegistrationNoPassService, RegistrationNoPassService>();
             services.AddSingleton<ILoginNoPassService, LoginNoPassService>();
@@ -57,6 +60,15 @@ namespace NoPassIntegrationExample
                 app.UseHsts();
             }
 
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("v1/swagger.json", "NoPass Integration Example");
+            });
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -68,6 +80,12 @@ namespace NoPassIntegrationExample
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+                endpoints.MapControllers();
+                endpoints.MapHub<CommunicationHub>("/signalR",
+                    options =>
+                    {
+                        options.Transports = HttpTransportType.LongPolling;
+                    });
             });
         }
     }
