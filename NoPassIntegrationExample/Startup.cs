@@ -8,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NoPassIntegrationExample.Data;
+using NoPassIntegrationExample.Services;
+using NoPassIntegrationExample.Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +36,10 @@ namespace NoPassIntegrationExample
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddRazorPages();
+
+            // Enable services for working with tokens
+            services.AddSingleton<IRegistrationNoPassService, RegistrationNoPassService>();
+            services.AddSingleton<ILoginNoPassService, LoginNoPassService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
