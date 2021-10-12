@@ -1,6 +1,6 @@
 Identité Terms and Conditions (https://www.identite.us/terms-and-conditions) and Privacy Policy (https://www.identite.us/privacy-policy)
 
-NoPass End User License Agreement Terms
+NoPass End User License Agreement Terms (https://www.identite.us/eula)
 
 1. NoPass shall grant End User a limited, non-transferable and non-exclusive right to use, during the term of the End User Agreement, the Software.
 
