@@ -43,6 +43,8 @@ namespace NoPassIntegrationExample
             // Enable services for working with tokens
             services.AddSingleton<IRegistrationNoPassService, RegistrationNoPassService>();
             services.AddSingleton<ILoginNoPassService, LoginNoPassService>();
+
+            services.Configure<NoPassSettings>(Configuration.GetSection("NoPassSettings"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
