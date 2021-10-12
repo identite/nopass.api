@@ -1,0 +1,30 @@
+﻿@page
+@model ConfirmPictureModel
+
+@{
+    ViewData["Title"] = "Confirm Picture";
+}
+
+<div class="row">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    @if (Model.isShowImage)
+    {
+        <div>
+            <img src="@Model.ImageData" class="imageNoPass" />
+            <h3 style="text-align: center;" class="nextChange"></h3>
+            <h5 class="showError"></h5>
+        </div>
+
+        <script>
+        const authId = "@Model.AuthId";
+        let nextChange = @Model.NextChange;
+        </script>
+        <script src="/microsoft-signalr/signalr.min.js"></script>
+        <script src="/js/confirmPicture.js"></script>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="_SignalRScriptsPartial" />
+}
